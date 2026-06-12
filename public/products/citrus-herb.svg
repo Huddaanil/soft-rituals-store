@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
+  <rect width="600" height="600" fill="#F6F0E3"/>
+  <ellipse cx="300" cy="425" rx="170" ry="28" fill="#B8690E" opacity=".13"/>
+  <circle cx="300" cy="290" r="150" fill="#D98E3F" opacity=".82"/>
+  <circle cx="300" cy="290" r="150" fill="none" stroke="#C07B2E" stroke-width="8"/>
+  <path d="M210 205a118 118 0 0 1 62-36" stroke="#FCE9BB" stroke-width="18" stroke-linecap="round" opacity=".7" fill="none"/>
+  <g fill="#5E7A50">
+    <rect x="255" y="265" width="32" height="11" rx="5.5" transform="rotate(24 255 265)"/>
+    <rect x="335" y="230" width="32" height="11" rx="5.5" transform="rotate(-30 335 230)"/>
+    <rect x="310" y="335" width="32" height="11" rx="5.5" transform="rotate(10 310 335)"/>
+    <rect x="230" y="325" width="27" height="11" rx="5.5" transform="rotate(-20 230 325)"/>
+    <rect x="362" y="300" width="27" height="11" rx="5.5" transform="rotate(40 362 300)"/>
+  </g>
+  <text x="300" y="495" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="40" letter-spacing="8" fill="#5C4A39">CITRUS HERB</text>
+  <text x="300" y="533" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="17" letter-spacing="4" fill="#8A7460">HANDMADE SOAP · SOFT RITUALS</text>
+</svg>
