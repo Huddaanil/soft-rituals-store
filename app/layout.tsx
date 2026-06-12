@@ -19,7 +19,7 @@ const fraunces = Fraunces({
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://soft-rituals-store.vercel.app"
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://ssoftrituals.com"
   ),
   title: {
     default: "Soft Rituals — Handcrafted candles and soaps, Maputo",

@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { PRODUCTS, CATEGORIES } from "@/lib/products";
 
 const BASE =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://soft-rituals-store.vercel.app";
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://ssoftrituals.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const statics = ["", "/shop", "/about", "/delivery", "/contact"].map(
