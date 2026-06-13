@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { getProducts } from "@/lib/catalog";
 import { supabase } from "@/lib/supabase";
+import { handoffWebOrder } from "@/lib/orderHandoff";
 
 export type PlaceOrderInput = {
   name: string;
@@ -95,6 +96,19 @@ export async function placeOrder(
     }),
     { maxAge: 60 * 60, path: "/", sameSite: "lax" }
   );
+
+  // Hand the order off to the Business App (mirror for production planning)
+  // and send a Telegram alert. Best-effort: never blocks the customer.
+  await handoffWebOrder({
+    orderNumber,
+    name,
+    phone,
+    deliveryArea,
+    note,
+    lines,
+    total,
+    paymentMethod,
+  });
 
   // Stripe test-mode path — activates automatically once
   // STRIPE_SECRET_KEY exists in the environment.
