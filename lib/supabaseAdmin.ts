@@ -52,6 +52,15 @@ export type AdminProductRow = {
   alt_pt?: string | null;
   seo_title_pt?: string | null;
   seo_description_pt?: string | null;
+  cost_ref?: string | null;
+};
+
+// A product from the Business App's costing data (records/state/main).
+export type CostingProduct = {
+  id: string;
+  name: string;
+  type?: string;
+  price: number;
 };
 
 export type AdminCategoryRow = {
@@ -64,7 +73,8 @@ export type AdminCategoryRow = {
   blurb_pt?: string | null;
 };
 
-const PRODUCT_PT = "name_pt,short_pt,story_pt,notes_pt,alt_pt,seo_title_pt,seo_description_pt";
+const PRODUCT_PT =
+  "name_pt,short_pt,story_pt,notes_pt,alt_pt,seo_title_pt,seo_description_pt,cost_ref";
 
 const PRODUCT_BASE =
   "slug,name,category,price,image,alt,short,story,notes,featured,active,seo_title,seo_description";
@@ -101,4 +111,32 @@ export async function adminListCategories(): Promise<AdminCategoryRow[]> {
   if (res.error) res = await q("slug,name,blurb,sort,active");
   if (res.error) throw new Error(res.error.message);
   return (res.data ?? []) as unknown as AdminCategoryRow[];
+}
+
+// Reads the Business App's products (and their calculated "Selling price each")
+// out of its single cloud state record. Returns [] if the app has no data yet.
+// Service-role only, so it can read the app's records past row-level security.
+export async function adminGetCostingProducts(): Promise<CostingProduct[]> {
+  try {
+    const { data, error } = await supabaseAdmin()
+      .from("records")
+      .select("data")
+      .eq("collection", "state")
+      .eq("id", "main")
+      .limit(1)
+      .maybeSingle();
+    if (error || !data) return [];
+    const payload = (data as { data?: { makeProducts?: unknown } }).data;
+    const list = Array.isArray(payload?.makeProducts) ? payload!.makeProducts : [];
+    return (list as Array<Record<string, unknown>>)
+      .filter((p) => p && typeof p.id === "string" && typeof p.name === "string")
+      .map((p) => ({
+        id: String(p.id),
+        name: String(p.name),
+        type: typeof p.type === "string" ? p.type : undefined,
+        price: Number(p.price) || 0,
+      }));
+  } catch {
+    return [];
+  }
 }

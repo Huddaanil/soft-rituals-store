@@ -82,6 +82,7 @@ export async function saveProduct(
     const altPt = String(formData.get("alt_pt") ?? "").trim();
     const seoTitlePt = String(formData.get("seoTitle_pt") ?? "").trim();
     const seoDescriptionPt = String(formData.get("seoDescription_pt") ?? "").trim();
+    const costRef = String(formData.get("cost_ref") ?? "").trim();
 
     if (name.length < 2) return { error: "Please give the product a name." };
     if (!category) return { error: "Please choose a section for this product." };
@@ -128,8 +129,9 @@ export async function saveProduct(
       alt_pt: altPt || null,
       seo_title_pt: seoTitlePt || null,
       seo_description_pt: seoDescriptionPt || null,
+      cost_ref: costRef || null,
     };
-    // Try writing PT columns; if they don't exist yet, save the base fields.
+    // Try writing PT/link columns; if they don't exist yet, save the base fields.
     let { error } = await supabaseAdmin()
       .from("store_products")
       .upsert(withPt, { onConflict: "slug" });

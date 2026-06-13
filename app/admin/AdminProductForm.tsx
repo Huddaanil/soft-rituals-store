@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useActionState, useState } from "react";
 import { saveProduct, type FormState } from "./actions";
-import type { AdminProductRow } from "@/lib/supabaseAdmin";
+import type { AdminProductRow, CostingProduct } from "@/lib/supabaseAdmin";
 
 const field =
   "mt-1.5 w-full rounded-lg border border-line bg-white px-4 py-2.5 text-ink outline-none focus:border-sage-deep";
@@ -14,10 +14,12 @@ const labelText = "text-[13px] font-medium text-ink-soft";
 export default function AdminProductForm({
   product,
   categories,
+  costingProducts = [],
   isNew,
 }: {
   product: AdminProductRow | null;
   categories: { slug: string; name: string }[];
+  costingProducts?: CostingProduct[];
   isNew: boolean;
 }) {
   const [state, formAction, pending] = useActionState<FormState, FormData>(
@@ -25,6 +27,11 @@ export default function AdminProductForm({
     {}
   );
   const [preview, setPreview] = useState<string | null>(product?.image ?? null);
+  const [price, setPrice] = useState<string>(
+    product?.price != null ? String(product.price) : ""
+  );
+  const [costRef, setCostRef] = useState<string>(product?.cost_ref ?? "");
+  const linked = costingProducts.find((c) => c.id === costRef);
 
   return (
     <form action={formAction} className="mt-8 grid gap-8 lg:grid-cols-[280px_1fr]">
@@ -77,7 +84,8 @@ export default function AdminProductForm({
               step="1"
               required
               inputMode="numeric"
-              defaultValue={product?.price ?? ""}
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
               className={field}
             />
           </label>
@@ -96,6 +104,62 @@ export default function AdminProductForm({
               ))}
             </select>
           </label>
+        </div>
+
+        {/* Costing link — pull the calculated price from the Business App */}
+        <div className="rounded-xl border border-amber/30 bg-amber/5 p-5">
+          <div className="text-sm font-semibold text-amber">
+            🧮 Linked to costing (Business App)
+          </div>
+          {costingProducts.length === 0 ? (
+            <p className="mt-2 text-[13px] text-ink-soft">
+              No costed products found in the Business App yet. Add a product with a
+              “Selling price each” there, and it will appear here to link.
+            </p>
+          ) : (
+            <>
+              <label className="mt-3 block">
+                <span className={labelText}>Which Business-App product is this?</span>
+                <select
+                  name="cost_ref"
+                  value={costRef}
+                  onChange={(e) => setCostRef(e.target.value)}
+                  className={field}
+                >
+                  <option value="">Not linked</option>
+                  {costingProducts.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                      {c.price ? ` — ${c.price.toLocaleString("en-US").replace(/,/g, " ")} MT` : ""}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {linked && (
+                <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">
+                  <span className="text-ink-soft">
+                    Calculated selling price:{" "}
+                    <b className="text-ink">
+                      {linked.price.toLocaleString("en-US").replace(/,/g, " ")} MT
+                    </b>
+                  </span>
+                  {String(linked.price) !== price && linked.price > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setPrice(String(linked.price))}
+                      className="rounded-full bg-ink px-4 py-1.5 text-[13px] font-semibold text-paper hover:bg-sage-deep"
+                      data-testid="use-costing-price"
+                    >
+                      Use this price
+                    </button>
+                  )}
+                  {String(linked.price) === price && (
+                    <span className="text-sage-deep">✓ shop price matches</span>
+                  )}
+                </div>
+              )}
+            </>
+          )}
         </div>
 
         <label className={label}>

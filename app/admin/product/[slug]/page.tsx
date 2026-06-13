@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { adminGetProduct, adminListCategories } from "@/lib/supabaseAdmin";
+import {
+  adminGetProduct,
+  adminListCategories,
+  adminGetCostingProducts,
+} from "@/lib/supabaseAdmin";
 import AdminProductForm from "../../AdminProductForm";
 import DeleteProductButton from "../../DeleteProductButton";
 
@@ -16,9 +20,10 @@ type Params = Promise<{ slug: string }>;
 
 export default async function EditProductPage({ params }: { params: Params }) {
   const { slug } = await params;
-  const [product, categories] = await Promise.all([
+  const [product, categories, costingProducts] = await Promise.all([
     adminGetProduct(slug),
     adminListCategories(),
+    adminGetCostingProducts(),
   ]);
   if (!product) notFound();
 
@@ -32,6 +37,7 @@ export default async function EditProductPage({ params }: { params: Params }) {
         product={product}
         isNew={false}
         categories={categories.map((c) => ({ slug: c.slug, name: c.name }))}
+        costingProducts={costingProducts}
       />
       <div className="mt-10 border-t border-line pt-6">
         <DeleteProductButton slug={product.slug} name={product.name} />
