@@ -1,7 +1,38 @@
 "use client";
 
-import { useActionState } from "react";
-import { saveCategory, type FormState } from "./actions";
+import { useActionState, useState, useTransition } from "react";
+import { saveCategory, deleteCategory, type FormState } from "./actions";
+
+function CategoryChip({ slug, name }: { slug: string; name: string }) {
+  const [pending, start] = useTransition();
+  const [err, setErr] = useState<string | null>(null);
+  return (
+    <li className="flex items-center gap-2 rounded-full border border-line bg-paper-2/60 py-2 pl-4 pr-2 text-sm">
+      <span>{name}</span>
+      <button
+        type="button"
+        aria-label={`Remove the ${name} section`}
+        title={err ?? "Remove this section"}
+        disabled={pending}
+        onClick={() => {
+          setErr(null);
+          start(async () => {
+            try {
+              await deleteCategory(slug);
+            } catch (e) {
+              setErr(e instanceof Error ? e.message : "Could not remove.");
+            }
+          });
+        }}
+        className={`flex h-5 w-5 items-center justify-center rounded-full text-xs ${
+          err ? "bg-rose text-paper" : "bg-ink/10 text-ink-soft hover:bg-ink hover:text-paper"
+        } disabled:opacity-50`}
+      >
+        ×
+      </button>
+    </li>
+  );
+}
 
 export default function CategoryManager({
   categories,
@@ -17,12 +48,7 @@ export default function CategoryManager({
     <div className="mt-5 grid gap-6 lg:grid-cols-2">
       <ul className="flex flex-wrap gap-2 self-start">
         {categories.map((c) => (
-          <li
-            key={c.slug}
-            className="rounded-full border border-line bg-paper-2/60 px-4 py-2 text-sm"
-          >
-            {c.name}
-          </li>
+          <CategoryChip key={c.slug} slug={c.slug} name={c.name} />
         ))}
       </ul>
 

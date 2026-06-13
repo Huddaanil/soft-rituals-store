@@ -152,6 +152,38 @@ export async function setProductFeatured(
   refreshStore();
 }
 
+export async function deleteProduct(slug: string): Promise<void> {
+  await requireAdmin();
+  const { error } = await supabaseAdmin()
+    .from("store_products")
+    .delete()
+    .eq("slug", slug);
+  if (error) throw new Error(error.message);
+  refreshStore();
+  redirect("/admin?removed=1");
+}
+
+export async function deleteCategory(slug: string): Promise<void> {
+  await requireAdmin();
+  // Don't orphan products: refuse to delete a section that still has items.
+  const { count, error: countErr } = await supabaseAdmin()
+    .from("store_products")
+    .select("slug", { count: "exact", head: true })
+    .eq("category", slug);
+  if (countErr) throw new Error(countErr.message);
+  if ((count ?? 0) > 0) {
+    throw new Error(
+      "This section still has products in it. Move or remove them first."
+    );
+  }
+  const { error } = await supabaseAdmin()
+    .from("store_categories")
+    .delete()
+    .eq("slug", slug);
+  if (error) throw new Error(error.message);
+  refreshStore();
+}
+
 export async function saveCategory(
   _prev: FormState | undefined,
   formData: FormData

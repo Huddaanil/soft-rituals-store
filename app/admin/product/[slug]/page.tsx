@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { adminGetProduct, adminListCategories } from "@/lib/supabaseAdmin";
 import AdminProductForm from "../../AdminProductForm";
+import DeleteProductButton from "../../DeleteProductButton";
 
 export const metadata: Metadata = {
   title: "Edit product",
@@ -32,6 +33,9 @@ export default async function EditProductPage({ params }: { params: Params }) {
         isNew={false}
         categories={categories.map((c) => ({ slug: c.slug, name: c.name }))}
       />
+      <div className="mt-10 border-t border-line pt-6">
+        <DeleteProductButton slug={product.slug} name={product.name} />
+      </div>
     </div>
   );
 }
