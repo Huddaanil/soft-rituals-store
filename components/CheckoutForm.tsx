@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useCart } from "@/lib/cart";
 import { formatMT } from "@/lib/format";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
+import type { Locale } from "@/lib/i18n/config";
 import { placeOrder } from "@/app/checkout/actions";
 
 const AREAS = [
@@ -17,27 +19,27 @@ const AREAS = [
   "Alto Maé",
   "Costa do Sol",
   "Matola",
-  "Other (tell us in the note)",
 ];
 
-export default function CheckoutForm() {
+export default function CheckoutForm({ locale }: { locale: Locale }) {
   const { items, subtotal, clear } = useCart();
+  const { t } = useLocale();
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const areaOther =
+    locale === "pt" ? "Outra (diga na nota)" : "Other (tell us in the note)";
 
   if (items.length === 0) {
     return (
       <div className="py-20 text-center">
-        <h1 className="font-display text-3xl">Your cart is empty</h1>
-        <p className="mt-3 text-ink-soft">
-          Find something small and calm first.
-        </p>
+        <h1 className="font-display text-3xl">{t.checkout.emptyTitle}</h1>
+        <p className="mt-3 text-ink-soft">{t.checkout.emptyBody}</p>
         <Link
-          href="/shop"
+          href={`/${locale}/shop`}
           className="mt-7 inline-block rounded-full bg-ink px-8 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-paper hover:bg-sage-deep"
         >
-          Browse the shop
+          {t.checkout.emptyCta}
         </Link>
       </div>
     );
@@ -56,6 +58,7 @@ export default function CheckoutForm() {
         deliveryArea: String(form.get("area") ?? ""),
         note: String(form.get("note") ?? ""),
         items: items.map((i) => ({ slug: i.slug, qty: i.qty })),
+        locale,
       });
       if (!result.ok) {
         setError(result.error);
@@ -66,12 +69,10 @@ export default function CheckoutForm() {
       if (result.redirectUrl) {
         window.location.assign(result.redirectUrl);
       } else {
-        router.push(`/order/${result.orderNumber}`);
+        router.push(`/${locale}/order/${result.orderNumber}`);
       }
     } catch {
-      setError(
-        "Something went wrong on our side. Please try again, or DM us on Instagram @ssoft.rituals."
-      );
+      setError(t.checkout.errorGeneric);
       setSubmitting(false);
     }
   }
@@ -79,28 +80,25 @@ export default function CheckoutForm() {
   return (
     <div className="grid gap-12 lg:grid-cols-[1fr_420px]">
       <form onSubmit={onSubmit} className="space-y-6" data-testid="checkout-form">
-        <h1 className="font-display text-3xl sm:text-4xl">Checkout</h1>
-        <p className="text-ink-soft">
-          No account needed. We confirm every order personally before anything
-          moves.
-        </p>
+        <h1 className="font-display text-3xl sm:text-4xl">{t.checkout.title}</h1>
+        <p className="text-ink-soft">{t.checkout.intro}</p>
 
         <div className="grid gap-5 sm:grid-cols-2">
           <label className="block">
             <span className="text-[13px] font-medium uppercase tracking-[0.1em]">
-              Your name *
+              {t.checkout.name} *
             </span>
             <input
               name="name"
               required
               autoComplete="name"
               className="mt-2 w-full rounded-lg border border-line bg-white px-4 py-3 text-ink outline-none focus:border-sage-deep"
-              placeholder="Maria Santos"
+              placeholder={t.checkout.namePh}
             />
           </label>
           <label className="block">
             <span className="text-[13px] font-medium uppercase tracking-[0.1em]">
-              Phone (WhatsApp) *
+              {t.checkout.phone} *
             </span>
             <input
               name="phone"
@@ -108,27 +106,27 @@ export default function CheckoutForm() {
               autoComplete="tel"
               inputMode="tel"
               className="mt-2 w-full rounded-lg border border-line bg-white px-4 py-3 text-ink outline-none focus:border-sage-deep"
-              placeholder="+258 84 000 0000"
+              placeholder={t.checkout.phonePh}
             />
           </label>
         </div>
 
         <label className="block">
           <span className="text-[13px] font-medium uppercase tracking-[0.1em]">
-            Email (optional)
+            {t.checkout.email}
           </span>
           <input
             name="email"
             type="email"
             autoComplete="email"
             className="mt-2 w-full rounded-lg border border-line bg-white px-4 py-3 text-ink outline-none focus:border-sage-deep"
-            placeholder="you@example.com"
+            placeholder={t.checkout.emailPh}
           />
         </label>
 
         <label className="block">
           <span className="text-[13px] font-medium uppercase tracking-[0.1em]">
-            Delivery area *
+            {t.checkout.area} *
           </span>
           <select
             name="area"
@@ -137,25 +135,26 @@ export default function CheckoutForm() {
             className="mt-2 w-full rounded-lg border border-line bg-white px-4 py-3 text-ink outline-none focus:border-sage-deep"
           >
             <option value="" disabled>
-              Choose your area in Maputo
+              {t.checkout.areaPlaceholder}
             </option>
             {AREAS.map((a) => (
               <option key={a} value={a}>
                 {a}
               </option>
             ))}
+            <option value={areaOther}>{areaOther}</option>
           </select>
         </label>
 
         <label className="block">
           <span className="text-[13px] font-medium uppercase tracking-[0.1em]">
-            Note (optional)
+            {t.checkout.note}
           </span>
           <textarea
             name="note"
             rows={3}
             className="mt-2 w-full rounded-lg border border-line bg-white px-4 py-3 text-ink outline-none focus:border-sage-deep"
-            placeholder="It's a gift / preferred delivery day / anything we should know"
+            placeholder={t.checkout.notePh}
           />
         </label>
 
@@ -175,17 +174,14 @@ export default function CheckoutForm() {
           className="w-full rounded-full bg-ink px-8 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-paper transition-colors hover:bg-sage-deep disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
           data-testid="place-order"
         >
-          {submitting ? "Placing your order…" : "Place order"}
+          {submitting ? t.checkout.placing : t.checkout.place}
         </button>
-        <p className="text-[13px] leading-5 text-ink-soft">
-          Payment is on delivery (cash or M-Pesa). We'll confirm your order and
-          the delivery fee personally before anything is charged.
-        </p>
+        <p className="text-[13px] leading-5 text-ink-soft">{t.checkout.payNote}</p>
       </form>
 
       <aside className="h-fit rounded-2xl border border-line bg-paper-2/50 p-6 lg:sticky lg:top-24">
         <h2 className="text-[12px] font-semibold uppercase tracking-[0.16em]">
-          Your order
+          {t.checkout.summaryTitle}
         </h2>
         <ul className="mt-4 divide-y divide-line">
           {items.map((i) => (
@@ -195,7 +191,9 @@ export default function CheckoutForm() {
               </div>
               <div className="flex-1 text-sm">
                 <div className="font-medium">{i.name}</div>
-                <div className="text-ink-soft">Qty {i.qty}</div>
+                <div className="text-ink-soft">
+                  {t.checkout.qty} {i.qty}
+                </div>
               </div>
               <div className="text-sm">{formatMT(i.price * i.qty)}</div>
             </li>
@@ -203,14 +201,14 @@ export default function CheckoutForm() {
         </ul>
         <div className="mt-2 flex items-center justify-between border-t border-line pt-4">
           <span className="text-[13px] uppercase tracking-[0.14em] text-ink-soft">
-            Total
+            {t.checkout.total}
           </span>
           <span className="font-display text-xl" data-testid="checkout-total">
             {formatMT(subtotal)}
           </span>
         </div>
         <p className="mt-3 text-[13px] leading-5 text-ink-soft">
-          Delivery fee arranged with you — it depends on your area.
+          {t.checkout.deliveryFee}
         </p>
       </aside>
     </div>

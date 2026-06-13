@@ -1,18 +1,21 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Product } from "@/lib/products";
+import type { Locale } from "@/lib/i18n/config";
 import { formatMT } from "@/lib/format";
 
 export default function ProductCard({
   product,
+  locale,
   priority = false,
 }: {
   product: Product;
+  locale: Locale;
   priority?: boolean;
 }) {
   return (
     <Link
-      href={`/products/${product.slug}`}
+      href={`/${locale}/products/${product.slug}`}
       className="group block"
       data-testid="product-card"
     >

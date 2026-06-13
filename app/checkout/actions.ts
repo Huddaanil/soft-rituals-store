@@ -11,6 +11,7 @@ export type PlaceOrderInput = {
   deliveryArea: string;
   note?: string;
   items: { slug: string; qty: number }[];
+  locale?: "pt" | "en";
 };
 
 export type PlaceOrderResult =
@@ -42,8 +43,10 @@ export async function placeOrder(
   if (!Array.isArray(input.items) || input.items.length === 0)
     return { ok: false, error: "Your cart is empty." };
 
+  const locale = input.locale === "en" ? "en" : "pt";
+
   // Prices come from the catalog, never from the client.
-  const catalog = await getProducts();
+  const catalog = await getProducts(locale);
   const lines: { slug: string; name: string; price: number; qty: number }[] = [];
   for (const item of input.items) {
     const product = catalog.find((p) => p.slug === item.slug);
@@ -111,8 +114,8 @@ export async function placeOrder(
             product_data: { name: l.name },
           },
         })),
-        success_url: `${siteUrl}/order/${orderNumber}?paid=1`,
-        cancel_url: `${siteUrl}/checkout`,
+        success_url: `${siteUrl}/${locale}/order/${orderNumber}?paid=1`,
+        cancel_url: `${siteUrl}/${locale}/checkout`,
         metadata: { order_number: orderNumber },
       });
       if (session.url)

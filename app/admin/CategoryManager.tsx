@@ -76,6 +76,24 @@ export default function CategoryManager({
             className="mt-1 w-full rounded-lg border border-line bg-white px-4 py-2.5 outline-none focus:border-sage-deep"
           />
         </label>
+        <div className="mt-3 grid gap-3 rounded-lg border border-sage/40 bg-sage/5 p-3 sm:grid-cols-2">
+          <label className="block">
+            <span className="text-[13px] text-sage-deep">🇵🇹 Nome (PT)</span>
+            <input
+              name="name_pt"
+              placeholder="ex. Banho & Corpo"
+              className="mt-1 w-full rounded-lg border border-line bg-white px-4 py-2.5 outline-none focus:border-sage-deep"
+            />
+          </label>
+          <label className="block">
+            <span className="text-[13px] text-sage-deep">🇵🇹 Frase (PT)</span>
+            <input
+              name="blurb_pt"
+              placeholder="ex. Cuidado suave, feito à mão."
+              className="mt-1 w-full rounded-lg border border-line bg-white px-4 py-2.5 outline-none focus:border-sage-deep"
+            />
+          </label>
+        </div>
         {state?.error && (
           <p role="alert" className="mt-3 text-[14px] text-rose">
             {state.error}

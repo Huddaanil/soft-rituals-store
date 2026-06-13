@@ -3,6 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PRODUCTS } from "@/lib/products";
+import { LOCALES, isLocale, type Locale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n";
 import { getProductBySlug, getProducts, getCategoryBySlug } from "@/lib/catalog";
 import { formatMT } from "@/lib/format";
 import AddToCart from "@/components/AddToCart";
@@ -10,23 +12,31 @@ import ProductCard from "@/components/ProductCard";
 
 export const revalidate = 300;
 
-type Params = Promise<{ slug: string }>;
-
 export function generateStaticParams() {
-  return PRODUCTS.map((p) => ({ slug: p.slug }));
+  return LOCALES.flatMap((locale) =>
+    PRODUCTS.map((p) => ({ locale, slug: p.slug }))
+  );
 }
 
 export async function generateMetadata({
   params,
 }: {
-  params: Params;
+  params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  const { locale, slug } = await params;
+  const lc = isLocale(locale) ? locale : "pt";
+  const product = await getProductBySlug(slug, lc);
   if (!product) return {};
   return {
     title: product.seoTitle,
     description: product.seoDescription,
+    alternates: {
+      canonical: `/${lc}/products/${slug}`,
+      languages: {
+        pt: `/pt/products/${slug}`,
+        en: `/en/products/${slug}`,
+      },
+    },
     openGraph: {
       title: product.seoTitle,
       description: product.seoDescription,
@@ -35,13 +45,20 @@ export async function generateMetadata({
   };
 }
 
-export default async function ProductPage({ params }: { params: Params }) {
-  const { slug } = await params;
-  const product = await getProductBySlug(slug);
+export default async function ProductPage({
+  params,
+}: {
+  params: Promise<{ locale: string; slug: string }>;
+}) {
+  const { locale, slug } = await params;
+  if (!isLocale(locale)) notFound();
+  const lc = locale as Locale;
+  const t = getDictionary(lc);
+  const product = await getProductBySlug(slug, lc);
   if (!product) notFound();
 
-  const category = await getCategoryBySlug(product.category);
-  const related = (await getProducts())
+  const category = await getCategoryBySlug(product.category, lc);
+  const related = (await getProducts(lc))
     .filter((p) => p.category === product.category && p.slug !== product.slug)
     .slice(0, 3);
 
@@ -68,11 +85,13 @@ export default async function ProductPage({ params }: { params: Params }) {
       />
 
       <nav className="text-[13px] text-ink-soft" aria-label="Breadcrumb">
-        <Link href="/shop" className="hover:text-ink">Shop</Link>
+        <Link href={`/${lc}/shop`} className="hover:text-ink">
+          {t.product.breadcrumbShop}
+        </Link>
         <span className="mx-2">/</span>
         {category && (
           <>
-            <Link href={`/shop?category=${category.slug}`} className="hover:text-ink">
+            <Link href={`/${lc}/shop?category=${category.slug}`} className="hover:text-ink">
               {category.name}
             </Link>
             <span className="mx-2">/</span>
@@ -116,7 +135,7 @@ export default async function ProductPage({ params }: { params: Params }) {
 
           <div className="mt-8 rounded-xl bg-paper-2 p-6">
             <h2 className="text-[12px] font-semibold uppercase tracking-[0.16em]">
-              The details
+              {t.product.details}
             </h2>
             <ul className="mt-3 space-y-2 text-[15px] text-ink-soft">
               {product.notes.map((n) => (
@@ -127,7 +146,7 @@ export default async function ProductPage({ params }: { params: Params }) {
               ))}
               <li className="flex gap-2.5">
                 <span aria-hidden="true" className="text-sage-deep">—</span>
-                Delivery in Maputo arranged personally after you order
+                {t.product.deliveryNote}
               </li>
             </ul>
           </div>
@@ -136,10 +155,10 @@ export default async function ProductPage({ params }: { params: Params }) {
 
       {related.length > 0 && (
         <section className="mt-20 border-t border-line pt-12">
-          <h2 className="font-display text-2xl">You may also like</h2>
+          <h2 className="font-display text-2xl">{t.product.alsoLike}</h2>
           <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 lg:grid-cols-3 lg:gap-x-6">
             {related.map((p) => (
-              <ProductCard key={p.slug} product={p} />
+              <ProductCard key={p.slug} product={p} locale={lc} />
             ))}
           </div>
         </section>

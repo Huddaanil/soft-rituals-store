@@ -45,6 +45,13 @@ export type AdminProductRow = {
   active: boolean;
   seo_title: string;
   seo_description: string;
+  name_pt?: string | null;
+  short_pt?: string | null;
+  story_pt?: string[] | null;
+  notes_pt?: string[] | null;
+  alt_pt?: string | null;
+  seo_title_pt?: string | null;
+  seo_description_pt?: string | null;
 };
 
 export type AdminCategoryRow = {
@@ -53,38 +60,45 @@ export type AdminCategoryRow = {
   blurb: string;
   sort: number;
   active: boolean;
+  name_pt?: string | null;
+  blurb_pt?: string | null;
 };
 
+const PRODUCT_PT = "name_pt,short_pt,story_pt,notes_pt,alt_pt,seo_title_pt,seo_description_pt";
+
+const PRODUCT_BASE =
+  "slug,name,category,price,image,alt,short,story,notes,featured,active,seo_title,seo_description";
+
+// Passing the column list as a plain string (not a literal) keeps the two
+// fallback queries the same TS type, so we can try-then-fallback cleanly.
 export async function adminListProducts(): Promise<AdminProductRow[]> {
-  const { data, error } = await supabaseAdmin()
-    .from("store_products")
-    .select(
-      "slug,name,category,price,image,alt,short,story,notes,featured,active,seo_title,seo_description,created_at"
-    )
-    .order("created_at", { ascending: true });
-  if (error) throw new Error(error.message);
-  return (data ?? []) as AdminProductRow[];
+  const q = (cols: string) =>
+    supabaseAdmin()
+      .from("store_products")
+      .select(cols)
+      .order("created_at", { ascending: true });
+  let res = await q(`${PRODUCT_BASE},created_at,${PRODUCT_PT}`);
+  if (res.error) res = await q(`${PRODUCT_BASE},created_at`);
+  if (res.error) throw new Error(res.error.message);
+  return (res.data ?? []) as unknown as AdminProductRow[];
 }
 
 export async function adminGetProduct(
   slug: string
 ): Promise<AdminProductRow | null> {
-  const { data, error } = await supabaseAdmin()
-    .from("store_products")
-    .select(
-      "slug,name,category,price,image,alt,short,story,notes,featured,active,seo_title,seo_description"
-    )
-    .eq("slug", slug)
-    .maybeSingle();
-  if (error) throw new Error(error.message);
-  return (data as AdminProductRow) ?? null;
+  const q = (cols: string) =>
+    supabaseAdmin().from("store_products").select(cols).eq("slug", slug).maybeSingle();
+  let res = await q(`${PRODUCT_BASE},${PRODUCT_PT}`);
+  if (res.error) res = await q(PRODUCT_BASE);
+  if (res.error) throw new Error(res.error.message);
+  return (res.data as unknown as AdminProductRow) ?? null;
 }
 
 export async function adminListCategories(): Promise<AdminCategoryRow[]> {
-  const { data, error } = await supabaseAdmin()
-    .from("store_categories")
-    .select("slug,name,blurb,sort,active")
-    .order("sort", { ascending: true });
-  if (error) throw new Error(error.message);
-  return (data ?? []) as AdminCategoryRow[];
+  const q = (cols: string) =>
+    supabaseAdmin().from("store_categories").select(cols).order("sort", { ascending: true });
+  let res = await q("slug,name,blurb,sort,active,name_pt,blurb_pt");
+  if (res.error) res = await q("slug,name,blurb,sort,active");
+  if (res.error) throw new Error(res.error.message);
+  return (res.data ?? []) as unknown as AdminCategoryRow[];
 }

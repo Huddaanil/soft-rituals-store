@@ -1,5 +1,11 @@
 import { PRODUCTS, CATEGORIES, type Product, type Category } from "@/lib/products";
 import { supabase } from "@/lib/supabase";
+import type { Locale } from "@/lib/i18n/config";
+
+const BASE_COLS =
+  "slug,name,category,price,image,alt,short,story,notes,featured,active,seo_title,seo_description,created_at";
+const PT_COLS =
+  "name_pt,short_pt,story_pt,notes_pt,alt_pt,seo_title_pt,seo_description_pt";
 
 type ProductRow = {
   slug: string;
@@ -15,74 +21,104 @@ type ProductRow = {
   active?: boolean;
   seo_title: string;
   seo_description: string;
+  // optional PT columns (may not exist before the migration runs)
+  name_pt?: string | null;
+  short_pt?: string | null;
+  story_pt?: string[] | null;
+  notes_pt?: string[] | null;
+  alt_pt?: string | null;
+  seo_title_pt?: string | null;
+  seo_description_pt?: string | null;
 };
 
-function fromRow(r: ProductRow): Product {
+const pick = <T,>(pt: T | null | undefined, en: T): T =>
+  pt === null || pt === undefined || (typeof pt === "string" && pt.trim() === "")
+    ? en
+    : pt;
+
+function fromRow(r: ProductRow, locale: Locale): Product {
+  const isPt = locale === "pt";
   return {
     slug: r.slug,
-    name: r.name,
+    name: isPt ? pick(r.name_pt, r.name) : r.name,
     category: r.category,
     price: r.price,
     image: r.image,
-    alt: r.alt,
-    short: r.short,
-    story: r.story ?? [],
-    notes: r.notes ?? [],
+    alt: isPt ? pick(r.alt_pt, r.alt) : r.alt,
+    short: isPt ? pick(r.short_pt, r.short) : r.short,
+    story: isPt ? pick(r.story_pt?.length ? r.story_pt : null, r.story) : r.story,
+    notes: isPt ? pick(r.notes_pt?.length ? r.notes_pt : null, r.notes) : r.notes,
     featured: r.featured,
-    seoTitle: r.seo_title,
-    seoDescription: r.seo_description,
+    seoTitle: isPt ? pick(r.seo_title_pt, r.seo_title) : r.seo_title,
+    seoDescription: isPt
+      ? pick(r.seo_description_pt, r.seo_description)
+      : r.seo_description,
   };
 }
 
-// Reads the catalog from Supabase; falls back to the bundled catalog
-// if the table is missing or the network hiccups, so the shop never
-// shows an empty shelf. Pass includeInactive for the owner panel.
+// Try the PT-aware select; if the _pt columns don't exist yet (pre-migration),
+// fall back to the base columns so the shop keeps working in English.
+async function selectProducts(includeInactive: boolean): Promise<ProductRow[] | null> {
+  const run = async (cols: string) => {
+    let q = supabase().from("store_products").select(cols);
+    if (!includeInactive) q = q.eq("active", true);
+    return q;
+  };
+  let res = await run(`${BASE_COLS},${PT_COLS}`);
+  if (res.error) res = await run(BASE_COLS);
+  if (res.error || !res.data || res.data.length === 0) return null;
+  return res.data as unknown as ProductRow[];
+}
+
 export async function getProducts(
+  locale: Locale,
   { includeInactive = false }: { includeInactive?: boolean } = {}
 ): Promise<Product[]> {
   try {
-    let query = supabase()
-      .from("store_products")
-      .select(
-        "slug,name,category,price,image,alt,short,story,notes,featured,active,seo_title,seo_description,created_at"
-      );
-    if (!includeInactive) query = query.eq("active", true);
-    const { data, error } = await query;
-    if (error || !data || data.length === 0) return PRODUCTS;
+    const rows = await selectProducts(includeInactive);
+    if (!rows) return PRODUCTS;
     const order = new Map(PRODUCTS.map((p, i) => [p.slug, i]));
-    return (data as (ProductRow & { created_at: string })[])
-      .map(fromRow)
-      .sort(
-        (a, b) => (order.get(a.slug) ?? 999) - (order.get(b.slug) ?? 999)
-      );
+    return rows
+      .map((r) => fromRow(r, locale))
+      .sort((a, b) => (order.get(a.slug) ?? 999) - (order.get(b.slug) ?? 999));
   } catch {
     return PRODUCTS;
   }
 }
 
 export async function getProductBySlug(
-  slug: string
+  slug: string,
+  locale: Locale
 ): Promise<Product | undefined> {
-  const all = await getProducts({ includeInactive: true });
+  const all = await getProducts(locale, { includeInactive: true });
   return all.find((p) => p.slug === slug);
 }
 
-type CategoryRow = { slug: string; name: string; blurb: string; sort: number };
+type CategoryRow = {
+  slug: string;
+  name: string;
+  blurb: string;
+  sort: number;
+  name_pt?: string | null;
+  blurb_pt?: string | null;
+};
 
-// Reads the shop's sections from Supabase, falling back to the bundled
-// list so the shop never loses its navigation.
-export async function getCategories(): Promise<Category[]> {
-  try {
-    const { data, error } = await supabase()
+export async function getCategories(locale: Locale): Promise<Category[]> {
+  const isPt = locale === "pt";
+  const run = (cols: string) =>
+    supabase()
       .from("store_categories")
-      .select("slug,name,blurb,sort")
+      .select(cols)
       .eq("active", true)
       .order("sort", { ascending: true });
-    if (error || !data || data.length === 0) return CATEGORIES;
-    return (data as CategoryRow[]).map((c) => ({
+  try {
+    let res = await run("slug,name,blurb,sort,name_pt,blurb_pt");
+    if (res.error) res = await run("slug,name,blurb,sort");
+    if (res.error || !res.data || res.data.length === 0) return CATEGORIES;
+    return (res.data as unknown as CategoryRow[]).map((c) => ({
       slug: c.slug,
-      name: c.name,
-      blurb: c.blurb,
+      name: isPt ? pick(c.name_pt, c.name) : c.name,
+      blurb: isPt ? pick(c.blurb_pt, c.blurb) : c.blurb,
     }));
   } catch {
     return CATEGORIES;
@@ -90,8 +126,9 @@ export async function getCategories(): Promise<Category[]> {
 }
 
 export async function getCategoryBySlug(
-  slug: string
+  slug: string,
+  locale: Locale
 ): Promise<Category | undefined> {
-  const all = await getCategories();
+  const all = await getCategories(locale);
   return all.find((c) => c.slug === slug);
 }

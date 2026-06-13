@@ -1,58 +1,67 @@
 import Image from "next/image";
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import { isLocale, type Locale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n";
 import { getProducts, getCategories } from "@/lib/catalog";
 import ProductCard from "@/components/ProductCard";
 
 export const revalidate = 300;
 
-export default async function HomePage() {
-  const [products, CATEGORIES] = await Promise.all([
-    getProducts(),
-    getCategories(),
+export default async function HomePage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  if (!isLocale(locale)) notFound();
+  const t = getDictionary(locale as Locale);
+  const [products, categories] = await Promise.all([
+    getProducts(locale as Locale),
+    getCategories(locale as Locale),
   ]);
   const featured = products.filter((p) => p.featured).slice(0, 4);
   const categoryImage = (slug: string) =>
     products.find((p) => p.category === slug)?.image ?? "/hero.jpg";
+  const L = (p: string) => `/${locale}${p}`;
 
   return (
     <>
-      {/* ---------- HERO ---------- */}
+      {/* HERO */}
       <section className="border-b border-line">
         <div className="mx-auto grid max-w-7xl lg:grid-cols-2">
           <div className="flex flex-col justify-center px-4 py-16 sm:px-8 lg:py-24 lg:pr-16">
             <p className="text-[12px] font-semibold uppercase tracking-[0.22em] text-sage-deep">
-              Handcrafted in Maputo
+              {t.hero.kicker}
             </p>
             <h1 className="mt-5 font-display text-4xl leading-[1.08] sm:text-5xl lg:text-6xl">
-              You work too much.
+              {t.hero.titleLine1}
               <br />
-              <em className="text-rose">Light something.</em>
+              <em className="text-rose">{t.hero.titleEm}</em>
             </h1>
             <p className="mt-6 max-w-md text-[17px] leading-7 text-ink-soft">
-              Soft Rituals makes handcrafted candles and soaps for people who
-              forget to stop. Five quiet minutes, sculpted by hand, poured one
-              at a time. Small rituals, big calm.
+              {t.hero.body}
             </p>
             <div className="mt-9 flex flex-wrap gap-4">
               <Link
-                href="/shop"
+                href={L("/shop")}
                 className="rounded-full bg-ink px-8 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-paper transition-colors hover:bg-sage-deep"
                 data-testid="hero-cta"
               >
-                Shop the collection
+                {t.hero.shopCta}
               </Link>
               <Link
-                href="/about"
+                href={L("/about")}
                 className="rounded-full border border-ink px-8 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:bg-paper-2"
               >
-                Our story
+                {t.hero.storyCta}
               </Link>
             </div>
           </div>
           <div className="relative min-h-[420px] lg:min-h-[620px]">
             <Image
               src="/hero.jpg"
-              alt="The Dahlia Bowl Set — a pink wax dahlia in a fluted ceramic pot with matching vase and tray, handmade by Soft Rituals"
+              alt={t.hero.kicker}
               fill
               priority
               sizes="(max-width: 1024px) 100vw, 50vw"
@@ -62,22 +71,22 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ---------- CATEGORIES ---------- */}
+      {/* CATEGORIES */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-8 lg:py-20">
         <div className="flex items-baseline justify-between gap-4">
-          <h2 className="font-display text-2xl sm:text-3xl">Browse by ritual</h2>
+          <h2 className="font-display text-2xl sm:text-3xl">{t.home.browseTitle}</h2>
           <Link
-            href="/shop"
+            href={L("/shop")}
             className="text-sm font-medium text-sage-deep underline underline-offset-4 hover:text-ink"
           >
-            View all
+            {t.home.viewAll}
           </Link>
         </div>
         <div className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6">
-          {CATEGORIES.map((c) => (
+          {categories.map((c) => (
             <Link
               key={c.slug}
-              href={`/shop?category=${c.slug}`}
+              href={L(`/shop?category=${c.slug}`)}
               className="group block"
               data-testid="category-tile"
             >
@@ -99,46 +108,43 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ---------- FEATURED ---------- */}
+      {/* FEATURED */}
       <section className="border-y border-line bg-paper-2/60">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-8 lg:py-20">
           <div className="flex items-baseline justify-between gap-4">
-            <h2 className="font-display text-2xl sm:text-3xl">The ones everyone asks about</h2>
+            <h2 className="font-display text-2xl sm:text-3xl">{t.home.featuredTitle}</h2>
             <Link
-              href="/shop"
+              href={L("/shop")}
               className="text-sm font-medium text-sage-deep underline underline-offset-4 hover:text-ink"
             >
-              Shop all
+              {t.home.shopAll}
             </Link>
           </div>
           <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 lg:grid-cols-4 lg:gap-x-6">
             {featured.map((p) => (
-              <ProductCard key={p.slug} product={p} />
+              <ProductCard key={p.slug} product={p} locale={locale as Locale} />
             ))}
           </div>
         </div>
       </section>
 
-      {/* ---------- MANIFESTO ---------- */}
+      {/* MANIFESTO */}
       <section className="mx-auto max-w-3xl px-4 py-20 text-center sm:px-8 lg:py-28">
         <p className="text-[12px] font-semibold uppercase tracking-[0.22em] text-sage-deep">
-          The idea
+          {t.home.ideaKicker}
         </p>
         <h2 className="mt-5 font-display text-3xl leading-snug sm:text-4xl">
-          A soft ritual is a small moment{" "}
-          <em className="text-rose">you keep for yourself.</em>
+          {t.home.ideaTitlePre}
+          <em className="text-rose">{t.home.ideaTitleEm}</em>
         </h2>
         <p className="mx-auto mt-6 max-w-xl text-[17px] leading-7 text-ink-soft">
-          Not a big change. Not a new routine. A flame lit while the kettle
-          boils. A bar of soap that smells like a garden. One candle on the
-          table after dinner. We make these things by hand in our kitchen in
-          Maputo, so your busiest days keep one quiet corner.
+          {t.home.ideaBody}
         </p>
         <Link
-          href="/about"
+          href={L("/about")}
           className="mt-8 inline-block rounded-full border border-ink px-8 py-3.5 text-sm font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:bg-ink hover:text-paper"
         >
-          Read our story
+          {t.home.ideaCta}
         </Link>
       </section>
     </>

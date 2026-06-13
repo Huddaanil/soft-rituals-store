@@ -5,9 +5,11 @@ import Link from "next/link";
 import { useEffect } from "react";
 import { useCart } from "@/lib/cart";
 import { formatMT } from "@/lib/format";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
 
 export default function CartDrawer() {
   const { items, subtotal, isOpen, close, setQty, remove } = useCart();
+  const { locale, t } = useLocale();
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -26,34 +28,34 @@ export default function CartDrawer() {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label="Shopping cart">
+    <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label={t.cart.title}>
       <button
         type="button"
-        aria-label="Close cart"
+        aria-label={t.cart.close}
         onClick={close}
         className="absolute inset-0 bg-ink/40"
       />
       <aside className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-paper shadow-2xl">
         <div className="flex items-center justify-between border-b border-line px-6 py-5">
-          <h2 className="font-display text-lg">Your cart</h2>
+          <h2 className="font-display text-lg">{t.cart.title}</h2>
           <button
             type="button"
             onClick={close}
             className="rounded-md border border-line px-3 py-1.5 text-sm font-medium text-ink hover:bg-paper-2"
           >
-            Close
+            {t.cart.close}
           </button>
         </div>
 
         {items.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
-            <p className="text-ink-soft">Your cart is empty — the calmest it will ever be.</p>
+            <p className="text-ink-soft">{t.cart.empty}</p>
             <Link
-              href="/shop"
+              href={`/${locale}/shop`}
               onClick={close}
               className="rounded-full bg-ink px-6 py-3 text-sm font-semibold uppercase tracking-[0.12em] text-paper hover:bg-sage-deep"
             >
-              Browse the shop
+              {t.cart.emptyCta}
             </Link>
           </div>
         ) : (
@@ -73,7 +75,7 @@ export default function CartDrawer() {
                       <div className="flex items-center rounded-full border border-line">
                         <button
                           type="button"
-                          aria-label={`Decrease quantity of ${item.name}`}
+                          aria-label={`${t.product.decrease}: ${item.name}`}
                           onClick={() => setQty(item.slug, item.qty - 1)}
                           className="px-3 py-1 text-ink hover:text-sage-deep"
                         >
@@ -84,7 +86,7 @@ export default function CartDrawer() {
                         </span>
                         <button
                           type="button"
-                          aria-label={`Increase quantity of ${item.name}`}
+                          aria-label={`${t.product.increase}: ${item.name}`}
                           onClick={() => setQty(item.slug, item.qty + 1)}
                           className="px-3 py-1 text-ink hover:text-sage-deep"
                         >
@@ -96,7 +98,7 @@ export default function CartDrawer() {
                         onClick={() => remove(item.slug)}
                         className="text-[13px] text-ink-soft underline underline-offset-2 hover:text-ink"
                       >
-                        Remove
+                        {t.cart.remove}
                       </button>
                     </div>
                   </div>
@@ -105,22 +107,19 @@ export default function CartDrawer() {
             </ul>
             <div className="border-t border-line px-6 py-5">
               <div className="flex items-center justify-between text-sm">
-                <span className="uppercase tracking-[0.14em] text-ink-soft">Subtotal</span>
+                <span className="uppercase tracking-[0.14em] text-ink-soft">{t.cart.subtotal}</span>
                 <span className="font-semibold" data-testid="cart-subtotal">
                   {formatMT(subtotal)}
                 </span>
               </div>
-              <p className="mt-2 text-[13px] leading-5 text-ink-soft">
-                Delivery in Maputo is arranged after you order — we confirm
-                everything personally.
-              </p>
+              <p className="mt-2 text-[13px] leading-5 text-ink-soft">{t.cart.deliveryNote}</p>
               <Link
-                href="/checkout"
+                href={`/${locale}/checkout`}
                 onClick={close}
                 className="mt-4 block rounded-full bg-ink px-6 py-3.5 text-center text-sm font-semibold uppercase tracking-[0.12em] text-paper hover:bg-sage-deep"
                 data-testid="go-to-checkout"
               >
-                Go to checkout
+                {t.cart.checkout}
               </Link>
             </div>
           </>

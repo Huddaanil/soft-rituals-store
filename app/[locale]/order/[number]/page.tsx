@@ -1,15 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { cookies } from "next/headers";
+import { notFound } from "next/navigation";
+import { isLocale, type Locale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n";
 import { formatMT } from "@/lib/format";
 
-export const metadata: Metadata = {
-  title: "Order received",
-  robots: { index: false },
-};
-
-type Params = Promise<{ number: string }>;
-type SearchParams = Promise<{ paid?: string }>;
+export const metadata: Metadata = { robots: { index: false } };
 
 type LastOrder = {
   number: string;
@@ -23,10 +20,13 @@ export default async function OrderPage({
   params,
   searchParams,
 }: {
-  params: Params;
-  searchParams: SearchParams;
+  params: Promise<{ locale: string; number: string }>;
+  searchParams: Promise<{ paid?: string }>;
 }) {
-  const { number } = await params;
+  const { locale, number } = await params;
+  if (!isLocale(locale)) notFound();
+  const lc = locale as Locale;
+  const t = getDictionary(lc);
   const { paid } = await searchParams;
 
   let order: LastOrder | null = null;
@@ -37,8 +37,10 @@ export default async function OrderPage({
       if (parsed.number === number) order = parsed;
     }
   } catch {
-    // cookie unreadable — fall through to the generic confirmation
+    // cookie unreadable — show the generic confirmation
   }
+
+  const firstName = order ? order.name.split(" ")[0] : "";
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-16 text-center sm:px-8 lg:py-24">
@@ -49,18 +51,17 @@ export default async function OrderPage({
         🕯️
       </div>
       <h1 className="mt-6 font-display text-4xl leading-tight" data-testid="order-thanks">
-        Thank you{order ? `, ${order.name.split(" ")[0]}` : ""}.
+        {t.order.thanks}
+        {firstName ? `, ${firstName}` : ""}.
       </h1>
       <p className="mt-4 text-[17px] leading-7 text-ink-soft">
-        Your order is in{paid === "1" ? " and your payment went through" : ""}.
-        We'll confirm everything personally — usually within the day — and
-        arrange delivery with you.
+        {paid === "1" ? t.order.receivedPaid : t.order.received}
       </p>
 
       <div className="mt-8 rounded-2xl border border-line bg-paper-2/50 p-6 text-left">
         <div className="flex items-center justify-between">
           <span className="text-[12px] font-semibold uppercase tracking-[0.16em] text-ink-soft">
-            Order number
+            {t.order.orderNumber}
           </span>
           <span className="font-mono font-semibold" data-testid="order-number">
             {number}
@@ -79,36 +80,36 @@ export default async function OrderPage({
               ))}
             </ul>
             <div className="flex justify-between border-t border-line pt-4 font-medium">
-              <span>Total</span>
+              <span>{t.order.total}</span>
               <span>{formatMT(order.total)}</span>
             </div>
             <p className="mt-3 text-[13px] text-ink-soft">
               {order.payment === "pay_on_delivery"
-                ? "Payment on delivery — cash or M-Pesa. Delivery fee arranged with you."
-                : "Payment by card. Delivery fee arranged with you."}
+                ? t.order.payOnDelivery
+                : t.order.payCard}
             </p>
           </>
         )}
       </div>
 
       <p className="mt-6 text-[15px] text-ink-soft">
-        Keep this number — and if you'd like anything changed, just{" "}
+        {t.order.keepNumberPre}
         <a
           href="https://instagram.com/ssoft.rituals"
           target="_blank"
           rel="noopener noreferrer"
           className="underline underline-offset-2 hover:text-ink"
         >
-          DM us on Instagram
+          {t.order.keepNumberLink}
         </a>
         .
       </p>
 
       <Link
-        href="/shop"
+        href={`/${lc}/shop`}
         className="mt-9 inline-block rounded-full bg-ink px-8 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-paper hover:bg-sage-deep"
       >
-        Keep browsing
+        {t.order.keepBrowsing}
       </Link>
     </div>
   );

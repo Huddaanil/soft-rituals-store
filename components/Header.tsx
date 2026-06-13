@@ -3,23 +3,27 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useCart } from "@/lib/cart";
-
-const NAV = [
-  { href: "/shop", label: "Shop" },
-  { href: "/about", label: "About" },
-  { href: "/delivery", label: "Delivery" },
-  { href: "/contact", label: "Contact" },
-];
+import { useLocale } from "@/lib/i18n/LocaleProvider";
+import LanguageToggle from "@/components/LanguageToggle";
 
 export default function Header() {
   const { count, open } = useCart();
+  const { locale, t } = useLocale();
   const [menuOpen, setMenuOpen] = useState(false);
+  const L = (p: string) => `/${locale}${p}`;
+
+  const NAV = [
+    { href: L("/shop"), label: t.nav.shop },
+    { href: L("/about"), label: t.nav.about },
+    { href: L("/delivery"), label: t.nav.delivery },
+    { href: L("/contact"), label: t.nav.contact },
+  ];
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-8">
         <Link
-          href="/"
+          href={L("")}
           className="font-display text-xl tracking-wide text-ink"
           onClick={() => setMenuOpen(false)}
         >
@@ -39,13 +43,14 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-3">
+          <LanguageToggle />
           <button
             type="button"
             onClick={open}
             className="relative rounded-full border border-ink px-4 py-2 text-[13px] font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:bg-ink hover:text-paper"
-            aria-label={`Open cart, ${count} items`}
+            aria-label={t.nav.cart}
           >
-            Cart
+            {t.nav.cart}
             <span
               className="ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-ink px-1 text-[11px] font-bold text-paper"
               data-testid="cart-count"
@@ -57,7 +62,7 @@ export default function Header() {
             type="button"
             className="md:hidden rounded-md border border-line p-2 text-ink"
             aria-expanded={menuOpen}
-            aria-label="Toggle menu"
+            aria-label={t.nav.menu}
             onClick={() => setMenuOpen((v) => !v)}
           >
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
@@ -72,10 +77,7 @@ export default function Header() {
       </div>
 
       {menuOpen && (
-        <nav
-          className="border-t border-line bg-paper px-4 py-3 md:hidden"
-          aria-label="Mobile"
-        >
+        <nav className="border-t border-line bg-paper px-4 py-3 md:hidden" aria-label="Mobile">
           {NAV.map((item) => (
             <Link
               key={item.href}

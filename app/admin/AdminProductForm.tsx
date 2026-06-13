@@ -130,6 +130,45 @@ export default function AdminProductForm({
           <input name="alt" defaultValue={product?.alt ?? ""} className={field} />
         </label>
 
+        <fieldset className="rounded-xl border border-sage/40 bg-sage/5 p-5">
+          <legend className="px-2 text-sm font-semibold text-sage-deep">
+            🇵🇹 Português (what Portuguese visitors see)
+          </legend>
+          <p className="mb-3 text-[13px] text-ink-soft">
+            Leave any field empty and the English version is shown instead.
+          </p>
+          <label className={label}>
+            <span className={labelText}>Nome</span>
+            <input name="name_pt" defaultValue={product?.name_pt ?? ""} className={field} />
+          </label>
+          <label className="mt-3 block">
+            <span className={labelText}>Frase curta (no cartão da loja)</span>
+            <input name="short_pt" defaultValue={product?.short_pt ?? ""} className={field} />
+          </label>
+          <label className="mt-3 block">
+            <span className={labelText}>História — um parágrafo por linha</span>
+            <textarea
+              name="story_pt"
+              rows={4}
+              defaultValue={(product?.story_pt ?? []).join("\n")}
+              className={field}
+            />
+          </label>
+          <label className="mt-3 block">
+            <span className={labelText}>Detalhes — um por linha</span>
+            <textarea
+              name="notes_pt"
+              rows={3}
+              defaultValue={(product?.notes_pt ?? []).join("\n")}
+              className={field}
+            />
+          </label>
+          <label className="mt-3 block">
+            <span className={labelText}>Descrição da foto</span>
+            <input name="alt_pt" defaultValue={product?.alt_pt ?? ""} className={field} />
+          </label>
+        </fieldset>
+
         <details className="rounded-lg border border-line p-4">
           <summary className="cursor-pointer text-sm font-medium">
             Search engine text (optional)
@@ -144,6 +183,19 @@ export default function AdminProductForm({
               name="seoDescription"
               rows={2}
               defaultValue={product?.seo_description ?? ""}
+              className={field}
+            />
+          </label>
+          <label className="mt-3 block">
+            <span className={labelText}>SEO título (PT)</span>
+            <input name="seoTitle_pt" defaultValue={product?.seo_title_pt ?? ""} className={field} />
+          </label>
+          <label className="mt-3 block">
+            <span className={labelText}>SEO descrição (PT)</span>
+            <textarea
+              name="seoDescription_pt"
+              rows={2}
+              defaultValue={product?.seo_description_pt ?? ""}
               className={field}
             />
           </label>

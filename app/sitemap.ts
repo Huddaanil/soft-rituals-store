@@ -1,32 +1,43 @@
 import type { MetadataRoute } from "next";
 import { getProducts, getCategories } from "@/lib/catalog";
+import { LOCALES } from "@/lib/i18n/config";
 
-const BASE =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://ssoftrituals.com";
+const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ssoftrituals.com";
 
 export const revalidate = 300;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  // Slugs are locale-independent; read once.
   const [products, categories] = await Promise.all([
-    getProducts(),
-    getCategories(),
+    getProducts("pt"),
+    getCategories("pt"),
   ]);
-  const statics = ["", "/shop", "/about", "/delivery", "/contact"].map(
-    (path) => ({
-      url: `${BASE}${path}`,
-      changeFrequency: "weekly" as const,
-      priority: path === "" ? 1 : 0.7,
-    })
-  );
-  const cats = categories.map((c) => ({
-    url: `${BASE}/shop?category=${c.slug}`,
-    changeFrequency: "weekly" as const,
-    priority: 0.6,
-  }));
-  const prods = products.map((p) => ({
-    url: `${BASE}/products/${p.slug}`,
-    changeFrequency: "weekly" as const,
-    priority: 0.8,
-  }));
-  return [...statics, ...cats, ...prods];
+
+  const paths = [
+    "",
+    "/shop",
+    "/about",
+    "/delivery",
+    "/contact",
+    ...categories.map((c) => `/shop?category=${c.slug}`),
+    ...products.map((p) => `/products/${p.slug}`),
+  ];
+
+  const entries: MetadataRoute.Sitemap = [];
+  for (const path of paths) {
+    for (const locale of LOCALES) {
+      entries.push({
+        url: `${BASE}/${locale}${path}`,
+        changeFrequency: "weekly",
+        priority: path === "" ? 1 : path.startsWith("/products") ? 0.8 : 0.6,
+        alternates: {
+          languages: {
+            pt: `${BASE}/pt${path}`,
+            en: `${BASE}/en${path}`,
+          },
+        },
+      });
+    }
+  }
+  return entries;
 }

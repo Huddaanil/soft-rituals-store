@@ -74,6 +74,14 @@ export async function saveProduct(
     const active = formData.get("active") === "on";
     const seoTitle = String(formData.get("seoTitle") ?? "").trim();
     const seoDescription = String(formData.get("seoDescription") ?? "").trim();
+    // Portuguese fields (optional; empty falls back to English at read time)
+    const namePt = String(formData.get("name_pt") ?? "").trim();
+    const shortPt = String(formData.get("short_pt") ?? "").trim();
+    const storyPt = linesToArray(String(formData.get("story_pt") ?? ""));
+    const notesPt = linesToArray(String(formData.get("notes_pt") ?? ""));
+    const altPt = String(formData.get("alt_pt") ?? "").trim();
+    const seoTitlePt = String(formData.get("seoTitle_pt") ?? "").trim();
+    const seoDescriptionPt = String(formData.get("seoDescription_pt") ?? "").trim();
 
     if (name.length < 2) return { error: "Please give the product a name." };
     if (!category) return { error: "Please choose a section for this product." };
@@ -96,26 +104,39 @@ export async function saveProduct(
     const image =
       uploadedUrl ?? existing?.image ?? "/products/flower-bowl-set.jpg";
 
-    const { error } = await supabaseAdmin()
+    const base = {
+      slug,
+      name,
+      category,
+      price,
+      image,
+      alt: alt || name,
+      short,
+      story,
+      notes,
+      featured,
+      active,
+      seo_title: seoTitle || `${name} | Soft Rituals`,
+      seo_description: seoDescription || short,
+    };
+    const withPt = {
+      ...base,
+      name_pt: namePt || null,
+      short_pt: shortPt || null,
+      story_pt: storyPt.length ? storyPt : null,
+      notes_pt: notesPt.length ? notesPt : null,
+      alt_pt: altPt || null,
+      seo_title_pt: seoTitlePt || null,
+      seo_description_pt: seoDescriptionPt || null,
+    };
+    // Try writing PT columns; if they don't exist yet, save the base fields.
+    let { error } = await supabaseAdmin()
       .from("store_products")
-      .upsert(
-        {
-          slug,
-          name,
-          category,
-          price,
-          image,
-          alt: alt || name,
-          short,
-          story,
-          notes,
-          featured,
-          active,
-          seo_title: seoTitle || `${name} | Soft Rituals`,
-          seo_description: seoDescription || short,
-        },
-        { onConflict: "slug" }
-      );
+      .upsert(withPt, { onConflict: "slug" });
+    if (error)
+      ({ error } = await supabaseAdmin()
+        .from("store_products")
+        .upsert(base, { onConflict: "slug" }));
     if (error) return { error: error.message };
     savedName = name;
   } catch (e) {
@@ -193,17 +214,23 @@ export async function saveCategory(
     await requireAdmin();
     const name = String(formData.get("name") ?? "").trim();
     const blurb = String(formData.get("blurb") ?? "").trim();
+    const namePt = String(formData.get("name_pt") ?? "").trim();
+    const blurbPt = String(formData.get("blurb_pt") ?? "").trim();
     const existingSlug = String(formData.get("slug") ?? "").trim();
     const sort = Math.round(Number(formData.get("sort") ?? 100)) || 100;
     if (name.length < 2) return { error: "Please give the section a name." };
 
     const slug = existingSlug || slugify(name);
-    const { error } = await supabaseAdmin()
+    let { error } = await supabaseAdmin()
       .from("store_categories")
       .upsert(
-        { slug, name, blurb, sort, active: true },
+        { slug, name, blurb, name_pt: namePt || null, blurb_pt: blurbPt || null, sort, active: true },
         { onConflict: "slug" }
       );
+    if (error)
+      ({ error } = await supabaseAdmin()
+        .from("store_categories")
+        .upsert({ slug, name, blurb, sort, active: true }, { onConflict: "slug" }));
     if (error) return { error: error.message };
     savedName = name;
   } catch (e) {
