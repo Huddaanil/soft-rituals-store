@@ -1,13 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
-import { CATEGORIES } from "@/lib/products";
-import { getProducts } from "@/lib/catalog";
+import { getProducts, getCategories } from "@/lib/catalog";
 import ProductCard from "@/components/ProductCard";
 
 export const revalidate = 300;
 
 export default async function HomePage() {
-  const products = await getProducts();
+  const [products, CATEGORIES] = await Promise.all([
+    getProducts(),
+    getCategories(),
+  ]);
   const featured = products.filter((p) => p.featured).slice(0, 4);
   const categoryImage = (slug: string) =>
     products.find((p) => p.category === slug)?.image ?? "/hero.jpg";

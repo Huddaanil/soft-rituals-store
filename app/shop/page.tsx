@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CATEGORIES, getCategory } from "@/lib/products";
-import { getProducts } from "@/lib/catalog";
+import { getProducts, getCategories, getCategoryBySlug } from "@/lib/catalog";
 import ProductCard from "@/components/ProductCard";
 
 export const revalidate = 300;
@@ -27,8 +26,11 @@ export default async function ShopPage({
   searchParams: SearchParams;
 }) {
   const { category, sort = "featured" } = await searchParams;
-  const all = await getProducts();
-  const activeCategory = category ? getCategory(category) : undefined;
+  const [all, CATEGORIES] = await Promise.all([
+    getProducts(),
+    getCategories(),
+  ]);
+  const activeCategory = category ? await getCategoryBySlug(category) : undefined;
 
   let products = activeCategory
     ? all.filter((p) => p.category === activeCategory.slug)

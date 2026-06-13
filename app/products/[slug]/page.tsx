@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PRODUCTS, getCategory } from "@/lib/products";
-import { getProductBySlug, getProducts } from "@/lib/catalog";
+import { PRODUCTS } from "@/lib/products";
+import { getProductBySlug, getProducts, getCategoryBySlug } from "@/lib/catalog";
 import { formatMT } from "@/lib/format";
 import AddToCart from "@/components/AddToCart";
 import ProductCard from "@/components/ProductCard";
@@ -40,7 +40,7 @@ export default async function ProductPage({ params }: { params: Params }) {
   const product = await getProductBySlug(slug);
   if (!product) notFound();
 
-  const category = getCategory(product.category);
+  const category = await getCategoryBySlug(product.category);
   const related = (await getProducts())
     .filter((p) => p.category === product.category && p.slug !== product.slug)
     .slice(0, 3);
