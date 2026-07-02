@@ -131,10 +131,16 @@ export async function saveProduct(
       seo_description_pt: seoDescriptionPt || null,
       cost_ref: costRef || null,
     };
-    // Try writing PT/link columns; if they don't exist yet, save the base fields.
+    // Try writing PT/link columns; if they don't exist yet, fall back — but
+    // never drop cost_ref unless that column itself is missing (it's the
+    // link that keeps the shop price/name synced to the Business App).
     let { error } = await supabaseAdmin()
       .from("store_products")
       .upsert(withPt, { onConflict: "slug" });
+    if (error)
+      ({ error } = await supabaseAdmin()
+        .from("store_products")
+        .upsert({ ...base, cost_ref: costRef || null }, { onConflict: "slug" }));
     if (error)
       ({ error } = await supabaseAdmin()
         .from("store_products")
