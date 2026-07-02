@@ -111,11 +111,21 @@ export default function AdminProductForm({
           <div className="text-sm font-semibold text-amber">
             🧮 Linked to costing (Business App)
           </div>
+          <p className="mt-1 text-[13px] text-ink-soft">
+            While linked, the shop shows this product’s <b>name and price from the
+            Business App</b> — change them there and the website follows.
+          </p>
           {costingProducts.length === 0 ? (
-            <p className="mt-2 text-[13px] text-ink-soft">
-              No costed products found in the Business App yet. Add a product with a
-              “Selling price each” there, and it will appear here to link.
-            </p>
+            <>
+              {/* Keep the existing link even when the app list can't be loaded,
+                  so saving other edits never silently un-links the product. */}
+              <input type="hidden" name="cost_ref" value={costRef} />
+              <p className="mt-2 text-[13px] text-ink-soft">
+                {costRef
+                  ? "Couldn’t load the Business-App product list right now — the existing link is kept."
+                  : "No costed products found in the Business App yet. Add a product with a “Selling price each” there, and it will appear here to link."}
+              </p>
+            </>
           ) : (
             <>
               <label className="mt-3 block">
@@ -127,6 +137,11 @@ export default function AdminProductForm({
                   className={field}
                 >
                   <option value="">Not linked</option>
+                  {costRef && !linked && (
+                    <option value={costRef}>
+                      Currently linked product (not in the app list right now)
+                    </option>
+                  )}
                   {costingProducts.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name}
@@ -138,10 +153,15 @@ export default function AdminProductForm({
               {linked && (
                 <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">
                   <span className="text-ink-soft">
-                    Calculated selling price:{" "}
-                    <b className="text-ink">
-                      {linked.price.toLocaleString("en-US").replace(/,/g, " ")} MT
-                    </b>
+                    Website will show: <b className="text-ink">{linked.name}</b>
+                    {linked.price > 0 && (
+                      <>
+                        {" — "}
+                        <b className="text-ink">
+                          {linked.price.toLocaleString("en-US").replace(/,/g, " ")} MT
+                        </b>
+                      </>
+                    )}
                   </span>
                   {String(linked.price) !== price && linked.price > 0 && (
                     <button
@@ -150,7 +170,7 @@ export default function AdminProductForm({
                       className="rounded-full bg-ink px-4 py-1.5 text-[13px] font-semibold text-paper hover:bg-sage-deep"
                       data-testid="use-costing-price"
                     >
-                      Use this price
+                      Copy price here too
                     </button>
                   )}
                   {String(linked.price) === price && (

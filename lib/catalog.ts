@@ -1,11 +1,16 @@
+import { cache } from "react";
 import { PRODUCTS, CATEGORIES, type Product, type Category } from "@/lib/products";
 import { supabase } from "@/lib/supabase";
+import {
+  adminGetCostingProducts,
+  type CostingProduct,
+} from "@/lib/supabaseAdmin";
 import type { Locale } from "@/lib/i18n/config";
 
 const BASE_COLS =
   "slug,name,category,price,image,alt,short,story,notes,featured,active,seo_title,seo_description,created_at";
 const PT_COLS =
-  "name_pt,short_pt,story_pt,notes_pt,alt_pt,seo_title_pt,seo_description_pt";
+  "name_pt,short_pt,story_pt,notes_pt,alt_pt,seo_title_pt,seo_description_pt,cost_ref";
 
 type ProductRow = {
   slug: string;
@@ -29,20 +34,35 @@ type ProductRow = {
   alt_pt?: string | null;
   seo_title_pt?: string | null;
   seo_description_pt?: string | null;
+  cost_ref?: string | null;
 };
+
+// Linked products (cost_ref) take their name and price LIVE from the
+// Business App, so Samira edits them in one place and the shop follows.
+// Cached per request; on any failure the shop falls back to its own columns.
+const getCostingById = cache(
+  async (): Promise<Map<string, CostingProduct>> => {
+    const list = await adminGetCostingProducts();
+    return new Map(list.map((c) => [c.id, c]));
+  }
+);
 
 const pick = <T,>(pt: T | null | undefined, en: T): T =>
   pt === null || pt === undefined || (typeof pt === "string" && pt.trim() === "")
     ? en
     : pt;
 
-function fromRow(r: ProductRow, locale: Locale): Product {
+function fromRow(
+  r: ProductRow,
+  locale: Locale,
+  linked?: CostingProduct
+): Product {
   const isPt = locale === "pt";
   return {
     slug: r.slug,
-    name: isPt ? pick(r.name_pt, r.name) : r.name,
+    name: linked?.name ?? (isPt ? pick(r.name_pt, r.name) : r.name),
     category: r.category,
-    price: r.price,
+    price: linked && linked.price > 0 ? linked.price : r.price,
     image: r.image,
     alt: isPt ? pick(r.alt_pt, r.alt) : r.alt,
     short: isPt ? pick(r.short_pt, r.short) : r.short,
@@ -77,9 +97,13 @@ export async function getProducts(
   try {
     const rows = await selectProducts(includeInactive);
     if (!rows) return PRODUCTS;
+    const anyLinked = rows.some((r) => r.cost_ref);
+    const costing = anyLinked ? await getCostingById() : null;
     const order = new Map(PRODUCTS.map((p, i) => [p.slug, i]));
     return rows
-      .map((r) => fromRow(r, locale))
+      .map((r) =>
+        fromRow(r, locale, r.cost_ref ? costing?.get(r.cost_ref) : undefined)
+      )
       .sort((a, b) => (order.get(a.slug) ?? 999) - (order.get(b.slug) ?? 999));
   } catch {
     return PRODUCTS;
