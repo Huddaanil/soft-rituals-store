@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 780">
+  <rect width="600" height="780" fill="#ECE8E2"/>
+  <!-- oval bowl -->
+  <ellipse cx="300" cy="390" rx="212" ry="372" fill="#D9D3CA" opacity=".5"/>
+  <ellipse cx="300" cy="388" rx="205" ry="362" fill="#FBFAF7"/>
+  <ellipse cx="300" cy="388" rx="170" ry="326" fill="#F3EEE5"/>
+  <ellipse cx="300" cy="388" rx="170" ry="326" fill="none" stroke="#E6DFD2" stroke-width="2"/>
+
+  <!-- pink chrysanthemum (top left) -->
+  <g transform="translate(214 182)">
+    <g fill="#F2A7C1">
+      <g id="crys"><ellipse rx="7" ry="34"/></g>
+      <use href="#crys" transform="rotate(30)"/><use href="#crys" transform="rotate(60)"/>
+      <use href="#crys" transform="rotate(90)"/><use href="#crys" transform="rotate(120)"/>
+      <use href="#crys" transform="rotate(150)"/><use href="#crys" transform="rotate(180)"/>
+      <use href="#crys" transform="rotate(210)"/><use href="#crys" transform="rotate(240)"/>
+      <use href="#crys" transform="rotate(270)"/><use href="#crys" transform="rotate(300)"/>
+      <use href="#crys" transform="rotate(330)"/>
+    </g>
+    <g fill="#F7C4D6" transform="scale(.62)">
+      <use href="#crys"/><use href="#crys" transform="rotate(45)"/><use href="#crys" transform="rotate(90)"/>
+      <use href="#crys" transform="rotate(135)"/><use href="#crys" transform="rotate(180)"/>
+      <use href="#crys" transform="rotate(225)"/><use href="#crys" transform="rotate(270)"/>
+      <use href="#crys" transform="rotate(315)"/>
+    </g>
+    <circle r="12" fill="#FCE3ED"/>
+  </g>
+
+  <!-- yellow blossom cluster (top right) -->
+  <g transform="translate(392 168)">
+    <g fill="#F6CE3C">
+      <circle cx="0" cy="-26" r="20"/><circle cx="25" cy="-8" r="20"/>
+      <circle cx="15" cy="22" r="20"/><circle cx="-15" cy="22" r="20"/>
+      <circle cx="-25" cy="-8" r="20"/>
+    </g>
+    <circle r="15" fill="#F4B21F"/>
+    <g fill="#EAA113"><circle cx="-4" cy="-3" r="2.4"/><circle cx="5" cy="-2" r="2.4"/><circle cx="0" cy="5" r="2.4"/></g>
+  </g>
+
+  <!-- sage leaf (mid left) -->
+  <g transform="translate(196 362)">
+    <path d="M0 60 C-46 34 -46 -30 0 -60 C46 -30 46 34 0 60 Z" fill="#B6BBB0"/>
+    <path d="M0 60 L0 -58" stroke="#9EA398" stroke-width="3" fill="none"/>
+    <g stroke="#9EA398" stroke-width="2.4" fill="none">
+      <path d="M0 30 C18 24 26 12 30 0"/><path d="M0 30 C-18 24 -26 12 -30 0"/>
+      <path d="M0 0 C18 -6 26 -18 30 -30"/><path d="M0 0 C-18 -6 -26 -18 -30 -30"/>
+    </g>
+  </g>
+
+  <!-- big orange cherry blossom (centre right) -->
+  <g transform="translate(360 372)">
+    <g fill="#F4931D">
+      <g id="sak"><path d="M0 -20 C-30 -30 -46 -78 -18 -104 C-8 -114 8 -114 18 -104 C46 -78 30 -30 0 -20 Z"/></g>
+      <use href="#sak" transform="rotate(72)"/><use href="#sak" transform="rotate(144)"/>
+      <use href="#sak" transform="rotate(216)"/><use href="#sak" transform="rotate(288)"/>
+    </g>
+    <g fill="#E8850F" opacity=".55">
+      <path d="M0 -22 L0 -96" stroke="#E8850F" stroke-width="2.5"/>
+      <path d="M0 -22 L0 -96" transform="rotate(72)" stroke="#E8850F" stroke-width="2.5"/>
+      <path d="M0 -22 L0 -96" transform="rotate(144)" stroke="#E8850F" stroke-width="2.5"/>
+      <path d="M0 -22 L0 -96" transform="rotate(216)" stroke="#E8850F" stroke-width="2.5"/>
+      <path d="M0 -22 L0 -96" transform="rotate(288)" stroke="#E8850F" stroke-width="2.5"/>
+    </g>
+    <circle r="20" fill="#F6C42E"/>
+    <g fill="#E8A50F"><circle cx="-6" cy="-4" r="2.6"/><circle cx="6" cy="-4" r="2.6"/><circle cx="0" cy="6" r="2.6"/><circle cx="-8" cy="6" r="2.6"/><circle cx="8" cy="6" r="2.6"/></g>
+  </g>
+
+  <!-- yellow rose (bottom left) -->
+  <g transform="translate(222 588)">
+    <circle r="56" fill="#EEBE2E"/>
+    <g fill="none" stroke="#F6D566" stroke-width="7" stroke-linecap="round">
+      <circle r="46"/><circle r="34"/><circle r="22"/><circle r="11"/>
+    </g>
+    <path d="M0 -50 A50 50 0 0 1 43 26" fill="none" stroke="#D9A518" stroke-width="4"/>
+  </g>
+
+  <!-- pink rose (bottom right) -->
+  <g transform="translate(384 592)">
+    <circle r="56" fill="#EC9CBB"/>
+    <g fill="none" stroke="#F7C2D6" stroke-width="7" stroke-linecap="round">
+      <circle r="46"/><circle r="34"/><circle r="22"/><circle r="11"/>
+    </g>
+    <path d="M0 -50 A50 50 0 0 1 43 26" fill="none" stroke="#D97AA0" stroke-width="4"/>
+  </g>
+</svg>

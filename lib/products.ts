@@ -69,6 +69,41 @@ export const PRODUCTS: Product[] = [
       "A pink wax dahlia in a fluted ceramic pot with matching vase and tray. Hand-sculpted candle, made in Maputo. Small rituals, big calm.",
   },
   {
+    slug: "flower-oval-bowl",
+    name: "Flower Oval Bowl",
+    category: "candles",
+    price: 1650,
+    image: "/products/flower-oval-bowl.svg",
+    alt: "Large white oval bowl candle in cream wax set with six sculpted flowers — a big orange cherry blossom at the centre, pink and yellow blooms around it",
+    short: "A big oval bowl of cream wax planted with six wax flowers — an orange blossom at its heart.",
+    story: [
+      "Six flowers, one bowl, no vase to top up. A pink chrysanthemum and a bright yellow blossom sit up top, a sage-grey leaf and a wide orange cherry blossom hold the middle, and a pair of roses — one yellow, one pink — close the bottom. All of it sculpted in wax and set into a large white oval bowl of soft cream.",
+      "It's the centrepiece for the table you keep meaning to tidy. Light a wick when the evening needs slowing down, or leave it whole as a garden that asks nothing of you.",
+    ],
+    notes: ["Six hand-sculpted wax flowers", "Large white oval bowl", "Orange blossom centrepiece"],
+    featured: true,
+    seoTitle: "Flower Oval Bowl — large sculpted flower candle | Soft Rituals",
+    seoDescription:
+      "A large white oval bowl candle set with six wax flowers around an orange cherry blossom. Hand-sculpted, made in Maputo by Soft Rituals.",
+  },
+  {
+    slug: "succulent-oval-bowl",
+    name: "Succulent Oval Bowl",
+    category: "candles",
+    price: 1250,
+    image: "/products/succulent-oval-bowl.svg",
+    alt: "Small white oval bowl candle in cream wax planted with six sculpted succulents in greens and teal",
+    short: "A small oval bowl of six wax succulents. The desert garden that never needs watering.",
+    story: [
+      "A teal agave, a lime maple leaf, a ruffled echeveria, a plump dark-green cluster, a teal leaf and a tidy green rosette — six little succulents sculpted in wax and nestled into a small white oval bowl of cream.",
+      "For the windowsill that's seen a few plants come and go. This one holds its shape through every forgotten watering, and lights one wick at a time when you want it to.",
+    ],
+    notes: ["Six sculpted wax succulents", "Small white oval bowl", "Greens and teal tones"],
+    seoTitle: "Succulent Oval Bowl — small sculpted succulent candle | Soft Rituals",
+    seoDescription:
+      "A small white oval bowl candle planted with six wax succulents in green and teal. The garden you cannot kill, handmade in Maputo.",
+  },
+  {
     slug: "succulent-garden-box",
     name: "Succulent Garden Box",
     category: "candles",
