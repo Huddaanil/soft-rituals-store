@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n";
 import { formatMT } from "@/lib/format";
+import { whatsappLink } from "@/lib/contact";
 
 export const metadata: Metadata = { robots: { index: false } };
 
@@ -104,6 +105,16 @@ export default async function OrderPage({
         </a>
         .
       </p>
+
+      <a
+        href={whatsappLink(`${t.order.waOrderMessage}${number}`)}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-4 inline-block rounded-full bg-sage-deep px-6 py-3 text-[13px] font-semibold uppercase tracking-[0.12em] text-paper hover:bg-ink"
+        data-testid="order-whatsapp"
+      >
+        {t.order.waOrderCta}
+      </a>
 
       <Link
         href={`/${lc}/shop`}

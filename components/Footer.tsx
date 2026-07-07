@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getCategories } from "@/lib/catalog";
+import { whatsappLink, WHATSAPP_DISPLAY } from "@/lib/contact";
 import { getDictionary } from "@/lib/i18n";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { headers } from "next/headers";
@@ -52,6 +53,16 @@ export default async function Footer() {
             {t.footer.findHead}
           </div>
           <ul className="mt-4 space-y-2.5 text-sm text-ink-soft">
+            <li>
+              <a
+                href={whatsappLink()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-ink"
+              >
+                WhatsApp — {WHATSAPP_DISPLAY}
+              </a>
+            </li>
             <li>
               <a
                 href="https://instagram.com/ssoft.rituals"

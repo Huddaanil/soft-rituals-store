@@ -106,6 +106,8 @@ const en = {
     keepNumberPre: "Keep this number — and if you'd like anything changed, just ",
     keepNumberLink: "DM us on Instagram",
     keepBrowsing: "Keep browsing",
+    waOrderCta: "WhatsApp us about this order",
+    waOrderMessage: "Hello Soft Rituals! I'm writing about my order ",
   },
   about: {
     kicker: "Our story",
@@ -163,8 +165,10 @@ const en = {
     kicker: "Contact",
     titlePre: "Talk to a person, ",
     titleEm: "not a ticket.",
-    body: "Orders, gift ideas, custom pieces for events, or just to ask what's fresh this week — send us a message on Instagram and we'll answer personally, usually the same day.",
+    body: "Orders, gift ideas, custom pieces for events, or just to ask what's fresh this week — message us on WhatsApp or Instagram and we'll answer personally, usually the same day.",
     dmCta: "DM us on Instagram — @ssoft.rituals",
+    waCta: "Order on WhatsApp",
+    waMessage: "Hello Soft Rituals! I'd like to place an order.",
     whereTitle: "Where",
     whereBody:
       "Maputo, Mozambique. Delivery across Maputo and Matola, arranged with you.",

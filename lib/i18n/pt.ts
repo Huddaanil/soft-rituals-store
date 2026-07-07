@@ -107,6 +107,8 @@ const pt: Dictionary = {
     keepNumberPre:
       "Guarde este número — e se quiser mudar alguma coisa, basta ",
     keepNumberLink: "enviar-nos mensagem no Instagram",
+    waOrderCta: "Fale connosco no WhatsApp sobre esta encomenda",
+    waOrderMessage: "Olá Soft Rituals! Escrevo sobre a minha encomenda ",
     keepBrowsing: "Continuar a ver",
   },
   about: {
@@ -165,8 +167,10 @@ const pt: Dictionary = {
     kicker: "Contacto",
     titlePre: "Fale com uma pessoa, ",
     titleEm: "não com um bilhete.",
-    body: "Encomendas, ideias de presente, peças personalizadas para eventos, ou só para saber o que há de novo esta semana — envie-nos mensagem no Instagram e respondemos pessoalmente, normalmente no mesmo dia.",
+    body: "Encomendas, ideias de presente, peças personalizadas para eventos, ou só para saber o que há de novo esta semana — envie-nos mensagem no WhatsApp ou no Instagram e respondemos pessoalmente, normalmente no mesmo dia.",
     dmCta: "Mensagem no Instagram — @ssoft.rituals",
+    waCta: "Encomendar pelo WhatsApp",
+    waMessage: "Olá Soft Rituals! Gostava de fazer uma encomenda.",
     whereTitle: "Onde",
     whereBody:
       "Maputo, Moçambique. Entregas em Maputo e na Matola, combinadas consigo.",

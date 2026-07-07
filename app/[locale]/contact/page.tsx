@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n";
+import { whatsappLink, WHATSAPP_DISPLAY } from "@/lib/contact";
 
 export async function generateMetadata({
   params,
@@ -37,6 +38,15 @@ export default async function ContactPage({
 
       <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
         <a
+          href={whatsappLink(t.contact.waMessage)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="rounded-full bg-sage-deep px-8 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-paper transition-colors hover:bg-ink"
+          data-testid="contact-whatsapp"
+        >
+          {t.contact.waCta}
+        </a>
+        <a
           href="https://instagram.com/ssoft.rituals"
           target="_blank"
           rel="noopener noreferrer"
@@ -46,6 +56,9 @@ export default async function ContactPage({
           {t.contact.dmCta}
         </a>
       </div>
+      <p className="mt-4 text-[15px] text-ink-soft">
+        WhatsApp: {WHATSAPP_DISPLAY}
+      </p>
 
       <div className="mx-auto mt-16 grid max-w-xl gap-4 text-left sm:grid-cols-2">
         <div className="rounded-xl border border-line p-6">
