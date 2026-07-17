@@ -46,6 +46,7 @@ export default async function Footer() {
             <li><Link href={L("/about")} className="hover:text-ink">{t.footer.aboutUs}</Link></li>
             <li><Link href={L("/delivery")} className="hover:text-ink">{t.footer.deliveryOrders}</Link></li>
             <li><Link href={L("/contact")} className="hover:text-ink">{t.footer.contact}</Link></li>
+            <li><Link href={L("/privacy")} className="hover:text-ink">{t.footer.privacy}</Link></li>
           </ul>
         </nav>
         <div>

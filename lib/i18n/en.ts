@@ -176,6 +176,34 @@ const en = {
     whenBody:
       "We reply personally, usually within the day — a little slower on pouring days.",
   },
+  privacy: {
+    kicker: "Privacy",
+    title: "Your details, kept simple.",
+    updated: "Last updated: 8 July 2026",
+    sections: [
+      {
+        h: "Who we are",
+        p: "Soft Rituals is a small handmade candle and soap business in Maputo, Mozambique. This page explains what happens to the details you give us when you order.",
+      },
+      {
+        h: "What we collect",
+        p: "When you place an order we ask only for what delivery needs: your name, phone number, delivery area and any note you add. Browsing the shop requires no account and no sign-up.",
+      },
+      {
+        h: "What we use it for",
+        p: "Only to confirm and deliver your order — usually with a WhatsApp or Instagram message from us. We do not send marketing, we do not sell or share your details with anyone, and we do not use advertising or tracking tools.",
+      },
+      {
+        h: "Where it lives",
+        p: "Orders are stored securely with our database provider (Supabase, hosted in the European Union). Payment on delivery means we never see or store card numbers.",
+      },
+      {
+        h: "Your choices",
+        p: "Ask us any time to see or delete the details we hold about you — one WhatsApp or Instagram message is enough.",
+      },
+    ],
+    contactCta: "Contact us",
+  },
   footer: {
     tagline:
       "Handcrafted candles and soaps from Maputo, Mozambique. Small rituals, big calm.",
@@ -185,6 +213,7 @@ const en = {
     aboutUs: "About us",
     deliveryOrders: "Delivery & orders",
     contact: "Contact",
+    privacy: "Privacy",
     findHead: "Find us",
     location: "Maputo, Mozambique",
     rights: "Handmade with love.",

@@ -178,6 +178,34 @@ const pt: Dictionary = {
     whenBody:
       "Respondemos pessoalmente, normalmente no mesmo dia — um pouco mais devagar nos dias de produção.",
   },
+  privacy: {
+    kicker: "Privacidade",
+    title: "Os seus dados, sem complicações.",
+    updated: "Última atualização: 8 de julho de 2026",
+    sections: [
+      {
+        h: "Quem somos",
+        p: "A Soft Rituals é um pequeno negócio artesanal de velas e sabonetes em Maputo, Moçambique. Esta página explica o que acontece aos dados que nos dá quando encomenda.",
+      },
+      {
+        h: "O que recolhemos",
+        p: "Quando faz uma encomenda pedimos apenas o necessário para a entrega: o seu nome, número de telefone, zona de entrega e qualquer nota que acrescente. Ver a loja não exige conta nem registo.",
+      },
+      {
+        h: "Para que usamos",
+        p: "Apenas para confirmar e entregar a sua encomenda — normalmente com uma mensagem nossa no WhatsApp ou Instagram. Não enviamos publicidade, não vendemos nem partilhamos os seus dados com ninguém, e não usamos ferramentas de rastreio.",
+      },
+      {
+        h: "Onde ficam guardados",
+        p: "As encomendas ficam guardadas em segurança no nosso fornecedor de base de dados (Supabase, alojado na União Europeia). Com pagamento na entrega, nunca vemos nem guardamos números de cartão.",
+      },
+      {
+        h: "As suas escolhas",
+        p: "Peça-nos a qualquer momento para ver ou apagar os dados que temos sobre si — basta uma mensagem no WhatsApp ou Instagram.",
+      },
+    ],
+    contactCta: "Fale connosco",
+  },
   footer: {
     tagline:
       "Velas e sabonetes artesanais de Maputo, Moçambique. Pequenos rituais, grande calma.",
@@ -187,6 +215,7 @@ const pt: Dictionary = {
     aboutUs: "Sobre nós",
     deliveryOrders: "Entregas & encomendas",
     contact: "Contacto",
+    privacy: "Privacidade",
     findHead: "Onde nos encontrar",
     location: "Maputo, Moçambique",
     rights: "Feito à mão com amor.",
